@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import healpy as hp
 
 class BackgroundNeutrinos:
     def __init__(self):
@@ -56,7 +57,7 @@ class BackgroundNeutrinos:
             ax[1, i].grid(True)
 
             # Plot histogram for energies
-            ax[i, 2].hist(np.log10(energies), bins=60, color='blue', alpha=0.5, label=f'{event_type.capitalize()}')
+            ax[i, 2].hist(np.log10(energies), bins=60, color='red', alpha=0.5, label=f'{event_type.capitalize()}')
             ax[i, 2].set_xlabel('log10(Energy)')
             # ax[i, 2].set_ylabel('Number of Sources')
             ax[i, 2].set_title('Histogram of Energy')
@@ -75,8 +76,25 @@ class BackgroundNeutrinos:
         plt.semilogy()
         plt.grid(True)
         plt.legend()
-        plt.savefig("Background_Energy")
+        plt.savefig("Background_Energy.png")
         plt.show()
+
+    def plot_skymap(self, events, nside=64):
+        for event_type, (ra, dec, energies) in events.items():
+            # Convert RA and Dec to theta and phi for healpy
+            theta = np.deg2rad(90 - dec)
+            phi = np.deg2rad(ra)
+            
+            # Create a healpy map
+            skymap = np.zeros(hp.nside2npix(nside))
+            pixels = hp.ang2pix(nside, theta, phi)
+            for pix in pixels:
+                skymap[pix] += 1
+            
+            # Plot the healpy map
+            hp.mollview(skymap, title=f"Skymap of {event_type.capitalize()} Sources", unit="Number of Sources", cmap="viridis")
+            hp.graticule()
+            plt.show()
 
 if __name__ == "__main__":
     simulator = BackgroundNeutrinos()
@@ -85,3 +103,6 @@ if __name__ == "__main__":
     
     # Plot histograms
     simulator.plot_histograms(events)
+    
+    # Plot skymap
+    simulator.plot_skymap(events)
