@@ -254,7 +254,11 @@ class SignalNeutrinos:
         # Sum neutrinos per energy bin for all sources
         sum_random_with_poisson = random_with_poisson.sum(axis=0)
         sum_identical_with_poisson = identical_with_poisson.sum(axis=0)
-        
+
+        #Normalised 
+        sum_random_with_poisson /= self.nSources
+        sum_identical_with_poisson /= self.nSources
+
         plt.figure(figsize=(10, 6))
         energy_bins = 10**lebins
         
@@ -281,7 +285,7 @@ if __name__ == "__main__":
     simulator.plot_skymap(events)
 
 lebins = np.log10(np.linspace(3, 6, 6))
-signal_random = SignalNeutrinos(smax=50, nsources=500, verbose=True)
+signal_random = SignalNeutrinos(smax=5, nsources=500, verbose=True)
 signal_random.createSample(lebins, invisible_fraction=0.1, identity_sources=False, use_poisson=True)
 
 #Plots
